@@ -1,0 +1,5 @@
+autoinstall:
+  version: 1
+  early-commands:
+    - wget -O /autoinstall.yaml https://raw.githubusercontent.com/StevenLudwig/linux/develop/autoinstall.yaml
+  

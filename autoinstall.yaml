@@ -13,21 +13,35 @@ autoinstall:
   storage:
     layout:
       name: lvm
+  network:
+    version: 2
+    ethernets:
+      enp1s0:
+        dhcp4: true
   snaps:
     - name: spotify
       classic: false
     - name: pycharm-community
+      channel: stable
       classic: true
     - name: sublime-text
       classic: true
-    - name: android-studios
+    - name: android-studio
       classic: true
   packages:
     - vim
+    - git
   late-commands:
-    - curtin in-target -- wget https://repo2.protonvpn.com/debian/dists/stable/main/binary-all/protonvpn-stable-release_1.0.3-3_all.deb
-    - curtin in-target -- dpkg -i ./protonvpn-stable-release_1.0.3-3_all.deb
-    - curtin in-target -- apt update
-    - curtin in-target -- apt install -y proton-vpn-gnome-desktop
+    # Add Docker's official GPG key:
+    - curtin in-target -- apt update -y
+    - curtin in-target -- apt install -y ca-certificates curl
+    - curtin in-target -- install -m 0755 -d /etc/apt/keyrings
+    - curtin in-target -- curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+    - curtin in-target -- chmod a+r /etc/apt/keyrings/docker.asc
+    # Add the repository to Apt sources:
+    - curtin in-target -- echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+    - curtin in-target -- apt update -y
+    # Installing docker
+    - curtin in-target -- apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
   updates: all
   shutdown: reboot
